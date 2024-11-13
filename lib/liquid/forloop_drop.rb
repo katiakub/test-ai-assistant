@@ -7,7 +7,7 @@ module Liquid
   # @liquid_summary
   #   Information about a parent [`for` loop](/docs/api/liquid/tags/for).
   class ForloopDrop < Drop
-    def initialize(name, length, parentloop)
+    def initialize(name: name, length: length, parentloop: parentloop)
       @name       = name
       @length     = length
       @parentloop = parentloop
