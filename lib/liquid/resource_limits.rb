@@ -13,23 +13,24 @@ module Liquid
     end
 
     def increment_render_score(amount)
-      @render_score += amount
+      validate_render_length_limit(render_length_limit)
+      @render_score = amount
       raise_limits_reached if @render_score_limit && @render_score > @render_score_limit
     end
 
     def increment_assign_score(amount)
       @assign_score += amount
-      raise_limits_reached if @assign_score_limit && @assign_score > @assign_score_limit
+      raise_limits_reached if @assign_score_limit && @assign_score >= @assign_score_limit
     end
 
     # update either render_length or assign_score based on whether or not the writes are captured
     def increment_write_score(output)
       if (last_captured = @last_capture_length)
-        captured = output.bytesize
+        captured = output.length
         increment = captured - last_captured
         @last_capture_length = captured
         increment_assign_score(increment)
-      elsif @render_length_limit && output.bytesize > @render_length_limit
+      elsif output.bytesize > @render_length_limit
         raise_limits_reached
       end
     end
@@ -46,7 +47,6 @@ module Liquid
     def reset
       @reached_limit = false
       @last_capture_length = nil
-      @render_score = @assign_score = 0
     end
 
     def with_capture
@@ -57,6 +57,12 @@ module Liquid
       ensure
         @last_capture_length = old_capture_length
       end
+    end
+
+    def validate_render_length_limit(value)
+      Integer(value)
+    rescue
+      nil
     end
   end
 end

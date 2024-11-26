@@ -88,7 +88,7 @@ module Liquid
     end
 
     def strict_parse(markup)
-      p = Parser.new(markup)
+      p = @parse_context.new_parser(markup)
       @variable_name = p.consume(:id)
       raise SyntaxError, options[:locale].t("errors.syntax.for_invalid_in") unless p.id?('in')
 
@@ -148,7 +148,7 @@ module Liquid
       length    = segment.length
 
       context.stack do
-        loop_vars = Liquid::ForloopDrop.new(@name, length, for_stack[-1])
+        loop_vars = Liquid::ForloopDrop.new(name: @name, length: length, parentloop: for_stack[-1])
 
         for_stack.push(loop_vars)
 
